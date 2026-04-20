@@ -46,10 +46,9 @@ export default function DayForm({ date }: DayFormProps) {
         {formatDateRu(date)}
       </h1>
 
-      {/* Saving indicator */}
-      {saving && (
-        <p className="text-[12px] text-[#3F7D58]">Сохраняю…</p>
-      )}
+      {/* TODO: saving indicator — if needed, render a fixed-position dot here:
+        <div className="fixed top-4 right-4 w-2 h-2 rounded-full bg-[#3F7D58] animate-pulse" />
+        Use `saving` from useDailyLog to toggle visibility. */}
 
       {/* === SLEEP === */}
       <section>
