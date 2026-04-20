@@ -1,45 +1,19 @@
 /**
- * Parse "HH:MM" or "HH:MM:SS" timestring into fractional hours
+ * Get sleep score color based on score value.
+ * < 60 → red, 60-79 → yellow, ≥ 80 → green
  */
-function timeToHours(t: string): number {
-  const parts = t.split(":");
-  return parseInt(parts[0], 10) + parseInt(parts[1], 10) / 60;
+export function getSleepScoreColor(score: number | null): string {
+  if (score === null) return "#1A1A1A";
+  if (score < 60) return "#DC2626";
+  if (score < 80) return "#CA8A04";
+  return "#16A34A";
 }
 
 /**
- * Calculate sleep duration from bed time and wake time.
- *
- * If sleep_bed > sleep_wake → crossed midnight → 24 - bed + wake
- * If sleep_bed < sleep_wake → same day (nap-like, unusual) → wake - bed
- *
- * Returns hours rounded to 0.1
- */
-export function calculateSleepHours(
-  sleepBed: string | null,
-  sleepWake: string | null
-): number | null {
-  if (!sleepBed || !sleepWake) return null;
-
-  const bed = timeToHours(sleepBed);
-  const wake = timeToHours(sleepWake);
-
-  let hours: number;
-  if (bed > wake) {
-    // Crossed midnight (normal case: went to bed at 23:00, woke at 07:00)
-    hours = 24 - bed + wake;
-  } else {
-    // Same day
-    hours = wake - bed;
-  }
-
-  return Math.round(hours * 10) / 10;
-}
-
-/**
- * Get sleep color based on hours.
+ * Get sleep hours color based on hours.
  * < 7 → red, 7-8 → yellow, ≥ 8 → green
  */
-export function getSleepColor(hours: number | null): string {
+export function getSleepHoursColor(hours: number | null): string {
   if (hours === null) return "#1A1A1A";
   if (hours < 7) return "#DC2626";
   if (hours < 8) return "#CA8A04";

@@ -5,8 +5,8 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { DailyLog } from "@/lib/types";
 import {
-  calculateSleepHours,
-  getSleepColor,
+  getSleepScoreColor,
+  getSleepHoursColor,
   isWorkoutDay,
   getLastNDates,
 } from "@/lib/utils";
@@ -41,15 +41,20 @@ export default function WeekPage() {
 
   // === Aggregates ===
 
-  // Sleep average
-  const sleepValues: number[] = [];
+  // Sleep score average
+  const scoreValues: number[] = [];
+  const hoursValues: number[] = [];
   logs.forEach((l) => {
-    const h = calculateSleepHours(l.sleep_bed, l.sleep_wake);
-    if (h !== null) sleepValues.push(h);
+    if (l.sleep_score !== null && l.sleep_score !== undefined) scoreValues.push(Number(l.sleep_score));
+    if (l.sleep_hours !== null && l.sleep_hours !== undefined) hoursValues.push(Number(l.sleep_hours));
   });
-  const avgSleep =
-    sleepValues.length > 0
-      ? Math.round((sleepValues.reduce((a, b) => a + b, 0) / sleepValues.length) * 10) / 10
+  const avgScore =
+    scoreValues.length > 0
+      ? Math.round(scoreValues.reduce((a, b) => a + b, 0) / scoreValues.length)
+      : null;
+  const avgHours =
+    hoursValues.length > 0
+      ? Math.round((hoursValues.reduce((a, b) => a + b, 0) / hoursValues.length) * 10) / 10
       : null;
 
   // Priorities: count done / total possible (3 per day × 7 = 21)
@@ -94,12 +99,20 @@ export default function WeekPage() {
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 gap-3 mb-8">
-        <SummaryCard
-          title="Сон"
-          value={avgSleep !== null ? `${avgSleep} ч` : "—"}
-          valueColor={getSleepColor(avgSleep)}
-          subtitle="среднее"
-        />
+        <div className="rounded-[12px] bg-white border border-[#1A1A1A]/5 p-4">
+          <p className="text-[14px] text-[#1A1A1A]/50 mb-1">Сон</p>
+          <p className="text-[20px] font-semibold tabular-nums" style={{ color: getSleepScoreColor(avgScore) }}>
+            {avgScore !== null ? avgScore : "—"}
+          </p>
+          {avgHours !== null && (
+            <p className="text-[12px] tabular-nums text-[#1A1A1A]/30 mt-0.5">
+              {avgHours} ч среднее
+            </p>
+          )}
+          {avgHours === null && (
+            <p className="text-[12px] text-[#1A1A1A]/30 mt-0.5">sleep score</p>
+          )}
+        </div>
         <SummaryCard
           title="Приоритеты"
           value={`${prioritiesDone} / ${prioritiesTotal}`}
@@ -128,7 +141,8 @@ export default function WeekPage() {
         <div className="space-y-2">
           {dates.map((d) => {
             const l = logMap.get(d);
-            const sleepH = l ? calculateSleepHours(l.sleep_bed, l.sleep_wake) : null;
+            const score = l?.sleep_score ?? null;
+            const hours = l?.sleep_hours ?? null;
             const dayLabel = new Date(d + "T00:00:00").toLocaleDateString("ru-RU", {
               weekday: "short",
               day: "numeric",
@@ -143,10 +157,15 @@ export default function WeekPage() {
               >
                 <span className="text-[16px] capitalize">{dayLabel}</span>
                 <div className="flex items-center gap-3 text-[14px]">
-                  {/* Sleep */}
-                  <span style={{ color: getSleepColor(sleepH) }}>
-                    {sleepH !== null ? `${sleepH}ч` : "—"}
+                  {/* Sleep score (primary) + hours (secondary) */}
+                  <span style={{ color: getSleepScoreColor(score) }}>
+                    {score !== null ? score : "—"}
                   </span>
+                  {hours !== null && (
+                    <span className="text-[12px] text-[#1A1A1A]/30">
+                      {hours}ч
+                    </span>
+                  )}
                   {/* Priorities done count */}
                   <span className="text-[#1A1A1A]/40">
                     {l

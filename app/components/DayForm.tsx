@@ -2,8 +2,8 @@
 
 import { useDailyLog } from "@/lib/useDailyLog";
 import {
-  calculateSleepHours,
-  getSleepColor,
+  getSleepScoreColor,
+  getSleepHoursColor,
   isWorkoutDay,
   formatDateRu,
 } from "@/lib/utils";
@@ -31,13 +31,7 @@ export default function DayForm({ date }: DayFormProps) {
     );
   }
 
-  const sleepHours = calculateSleepHours(log.sleep_bed, log.sleep_wake);
-  const sleepColor = getSleepColor(sleepHours);
   const showWorkout = isWorkoutDay(date);
-
-  // Convert "HH:MM:SS" from DB to "HH:MM" for input[type=time]
-  const bedValue = log.sleep_bed ? log.sleep_bed.slice(0, 5) : "";
-  const wakeValue = log.sleep_wake ? log.sleep_wake.slice(0, 5) : "";
 
   return (
     <div className="space-y-6">
@@ -58,33 +52,66 @@ export default function DayForm({ date }: DayFormProps) {
         <div className="flex gap-3">
           <div className="flex-1">
             <label className="block text-[14px] text-[#1A1A1A]/60 mb-1">
-              Лёг вчера
+              Часы сна
             </label>
             <input
-              type="time"
-              value={bedValue}
-              onChange={(e) => updateField({ sleep_bed: e.target.value || null })}
+              type="number"
+              inputMode="decimal"
+              min={0}
+              max={12}
+              step={0.1}
+              value={log.sleep_hours ?? ""}
+              onChange={(e) => {
+                const val = e.target.value;
+                updateField({
+                  sleep_hours: val === "" ? null : parseFloat(val),
+                });
+              }}
+              placeholder="0"
               className="w-full rounded-[8px] border border-[#1A1A1A]/10 bg-white px-3 py-2.5 text-[16px] outline-none focus:border-[#3F7D58] transition-colors"
             />
           </div>
           <div className="flex-1">
             <label className="block text-[14px] text-[#1A1A1A]/60 mb-1">
-              Встал сегодня
+              Sleep Score
             </label>
             <input
-              type="time"
-              value={wakeValue}
-              onChange={(e) => updateField({ sleep_wake: e.target.value || null })}
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={100}
+              step={1}
+              value={log.sleep_score ?? ""}
+              onChange={(e) => {
+                const val = e.target.value;
+                updateField({
+                  sleep_score: val === "" ? null : parseInt(val, 10),
+                });
+              }}
+              placeholder="0"
               className="w-full rounded-[8px] border border-[#1A1A1A]/10 bg-white px-3 py-2.5 text-[16px] outline-none focus:border-[#3F7D58] transition-colors"
             />
           </div>
         </div>
-        <p
-          className="mt-3 text-[32px] font-semibold tabular-nums"
-          style={{ color: sleepColor }}
-        >
-          {sleepHours !== null ? `${sleepHours} ч` : "—"}
-        </p>
+        {/* Big score display */}
+        <div className="mt-3 flex items-baseline gap-3">
+          <p
+            className="text-[32px] font-semibold tabular-nums"
+            style={{ color: getSleepScoreColor(log.sleep_score) }}
+          >
+            {log.sleep_score !== null && log.sleep_score !== undefined
+              ? log.sleep_score
+              : "—"}
+          </p>
+          {log.sleep_hours !== null && log.sleep_hours !== undefined && (
+            <p
+              className="text-[16px] tabular-nums"
+              style={{ color: getSleepHoursColor(log.sleep_hours) }}
+            >
+              {log.sleep_hours} ч
+            </p>
+          )}
+        </div>
       </section>
 
       {/* === PRIORITIES === */}

@@ -1,8 +1,8 @@
 export interface DailyLog {
   id: string;
   date: string; // "YYYY-MM-DD"
-  sleep_bed: string | null; // "HH:MM:SS" or null
-  sleep_wake: string | null; // "HH:MM:SS" or null
+  sleep_hours: number | null; // часы сна, e.g. 7.5
+  sleep_score: number | null; // sleep score 0-100
   priority_work: string | null;
   priority_work_done: boolean;
   priority_tazkiya: string | null;
