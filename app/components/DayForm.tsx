@@ -171,35 +171,36 @@ export default function DayForm({ date }: DayFormProps) {
       </section>
 
       {/* === WORKOUT === */}
-      {showWorkout && (
-        <section>
-          <h2 className="text-[14px] font-medium text-[#1A1A1A]/50 uppercase tracking-wide mb-3">
-            Зал
-          </h2>
-          <div className="flex gap-2">
-            <button
-              onClick={() => updateField({ workout_done: true })}
-              className={`rounded-[8px] px-4 py-2.5 text-[16px] font-medium transition-colors ${
-                log.workout_done === true
-                  ? "bg-[#3F7D58] text-white"
-                  : "bg-[#1A1A1A]/5 text-[#1A1A1A]/60"
-              }`}
-            >
-              Был
-            </button>
-            <button
-              onClick={() => updateField({ workout_done: false })}
-              className={`rounded-[8px] px-4 py-2.5 text-[16px] font-medium transition-colors ${
-                log.workout_done === false
-                  ? "bg-[#DC2626] text-white"
-                  : "bg-[#1A1A1A]/5 text-[#1A1A1A]/60"
-              }`}
-            >
-              Не был
-            </button>
-          </div>
-        </section>
-      )}
+      <section>
+        <h2 className="text-[14px] font-medium text-[#1A1A1A]/50 uppercase tracking-wide mb-1">
+          Зал
+        </h2>
+        <p className="text-[12px] text-[#1A1A1A]/30 mb-3">
+          {showWorkout ? "тренировочный день" : "доп. тренировка (опционально)"}
+        </p>
+        <div className="flex gap-2">
+          <button
+            onClick={() => updateField({ workout_done: true })}
+            className={`rounded-[8px] px-4 py-2.5 text-[16px] font-medium transition-colors ${
+              log.workout_done === true
+                ? "bg-[#3F7D58] text-white"
+                : "bg-[#1A1A1A]/5 text-[#1A1A1A]/60"
+            }`}
+          >
+            Был
+          </button>
+          <button
+            onClick={() => updateField({ workout_done: false })}
+            className={`rounded-[8px] px-4 py-2.5 text-[16px] font-medium transition-colors ${
+              log.workout_done === false
+                ? "bg-[#DC2626] text-white"
+                : "bg-[#1A1A1A]/5 text-[#1A1A1A]/60"
+            }`}
+          >
+            Не был
+          </button>
+        </div>
+      </section>
     </div>
   );
 }
